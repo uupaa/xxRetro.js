@@ -1,0 +1,72 @@
+Graphics Feature Status
+Canvas: Hardware accelerated
+Flash: Hardware accelerated
+Flash Stage3D: Hardware accelerated
+Flash Stage3D Baseline profile: Hardware accelerated
+Compositing: Hardware accelerated
+Multiple Raster Threads: Disabled
+Rasterization: Hardware accelerated
+Threaded Rasterization: Enabled
+Video Decode: Hardware accelerated
+Video Encode: Software only, hardware acceleration unavailable
+WebGL: Hardware accelerated
+Driver Bug Workarounds
+clear_uniforms_before_first_program_use
+disable_blend_equation_advanced
+disable_chromium_framebuffer_multisample
+disable_depth_texture
+disable_multisampled_render_to_texture
+scalarize_vec_and_mat_constructor_args
+use_virtualized_gl_contexts
+wake_up_gpu_before_drawing
+Problems Detected
+MediaCodec is still too buggy to use for encoding (b/11536167)
+Disabled Features: accelerated_video_encode
+Disable depth textures on Android with Qualcomm GPUs
+Applied Workarounds: disable_depth_texture
+Non-virtual contexts on Qualcomm sometimes cause out-of-order frames: 289461
+Applied Workarounds: use_virtualized_gl_contexts
+The first draw operation from an idle state is slow: 309734
+Applied Workarounds: wake_up_gpu_before_drawing
+ES3 MSAA is broken on Qualcomm
+Applied Workarounds: disable_chromium_framebuffer_multisample, disable_multisampled_render_to_texture
+Clear uniforms before first program use on all platforms: 124764, 349137
+Applied Workarounds: clear_uniforms_before_first_program_use
+Always rewrite vec/mat constructors to be consistent: 398694
+Applied Workarounds: scalarize_vec_and_mat_constructor_args
+GL_KHR_blend_equation_advanced breaks blending on Adreno 4xx: 488485
+Applied Workarounds: disable_blend_equation_advanced
+Raster is using a single thread.
+Disabled Features: multiple_raster_threads
+Version Information
+Data exported	2015/6/16 17:11:09
+Chrome version	Chrome/43.0.2357.93
+Operating system	Android 5.0.2
+Software rendering list version	10.7
+Driver bug list version	8.07
+ANGLE commit id	99f075dade7c
+2D graphics backend	Skia
+Command Line Args	--use-mobile-user-agent --enable-begin-frame-scheduling --enable-pinch --enable-overlay-fullscreen-video --enable-overlay-scrollbar --validate-input-event-stream --disable-gpu-process-crash-limit --enable-viewport-meta --main-frame-resizes-are-orientation-changes --disable-composited-antialiasing --ui-prioritize-in-gpu-process --enable-delegated-renderer --profiler-timing=0 --prerender-from-omnibox=enabled --enable-dom-distiller --flag-switches-begin --flag-switches-end --use-mobile-user-agent --top-controls-show-threshold=0.5 --top-controls-hide-threshold=0.5 --top-controls-show-threshold=0.5 --top-controls-hide-threshold=0.5
+Driver Information
+Initialization time	28
+Sandboxed	false
+GPU0	VENDOR = 0x0000 [Qualcomm], DEVICE= 0x0000 [Adreno (TM) 430]
+Optimus	false
+AMD switchable	false
+Driver vendor	
+Driver version	103.0
+Driver date	
+Pixel shader version	3.10
+Vertex shader version	3.10
+Machine model name	SOV31
+Machine model version	
+GL_VENDOR	Qualcomm
+GL_RENDERER	Adreno (TM) 430
+GL_VERSION	OpenGL ES 3.1 V@103.0 (GIT@)
+GL_EXTENSIONS	GL_EXT_debug_marker GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_sync GL_OES_vertex_half_float GL_OES_framebuffer_object GL_OES_rgb8_rgba8 GL_OES_compressed_ETC1_RGB8_texture GL_AMD_compressed_ATC_texture GL_KHR_texture_compression_astc_ldr GL_OES_texture_npot GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_OES_texture_3D GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_QCOM_alpha_test GL_OES_depth24 GL_OES_packed_depth_stencil GL_OES_depth_texture GL_OES_depth_texture_cube_map GL_EXT_sRGB GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_EXT_texture_type_2_10_10_10_REV GL_EXT_texture_sRGB_decode GL_OES_element_index_uint GL_EXT_copy_image GL_EXT_geometry_shader GL_EXT_tessellation_shader GL_OES_texture_stencil8 GL_EXT_shader_io_blocks GL_OES_shader_image_atomic GL_OES_sample_variables GL_EXT_texture_border_clamp GL_EXT_multisampled_render_to_texture GL_OES_shader_multisample_interpolation GL_EXT_texture_cube_map_array GL_EXT_draw_buffers_indexed GL_EXT_gpu_shader5 GL_EXT_robustness GL_EXT_texture_buffer GL_OES_texture_storage_multisample_2d_array GL_OES_sample_shading GL_OES_get_program_binary GL_EXT_debug_label GL_KHR_blend_equation_advanced GL_KHR_blend_equation_advanced_coherent GL_QCOM_tiled_rendering GL_ANDROID_extension_pack_es31a GL_EXT_primitive_bounding_box GL_OES_standard_derivatives GL_OES_vertex_array_object GL_EXT_disjoint_timer_query GL_KHR_debug GL_EXT_sRGB_write_control GL_EXT_texture_norm16 GL_EXT_discard_framebuffer
+Window system binding vendor	Android
+Window system binding version	1.4 Android META-EGL
+Window system binding extensions	EGL_KHR_get_all_proc_addresses EGL_ANDROID_presentation_time EGL_KHR_image EGL_KHR_image_base EGL_KHR_lock_surface EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_reusable_sync EGL_KHR_fence_sync EGL_KHR_create_context EGL_EXT_create_context_robustness EGL_ANDROID_image_native_buffer EGL_KHR_wait_sync EGL_ANDROID_recordable
+Direct rendering	Yes
+Reset notification strategy	0x8252
+GPU process crash count	0

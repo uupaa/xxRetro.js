@@ -1,0 +1,152 @@
+<!DOCTYPE html><html><head><title>Air test</title>
+<meta name="viewport" content="">
+<meta charset="utf-8"></head><body>
+<style>.selected { text-decoration: underline; color: red }</style>
+
+<input type="button" value="play"       onclick="game && game.play()" />
+<input type="button" value="pause"      onclick="game && game.pause()" />
+<br />
+<input type="button" value="2015/2月"  onclick="setConfig('CACHE', 'off'); setConfig('BS',    8); setConfig('DELAY', 100); setConfig('CHARS', 500); setConfig('SIZE',  '960x480'); location.reload()" />
+<input type="button" value="2015/4月"  onclick="setConfig('CACHE', 'off'); setConfig('BS',    8); setConfig('DELAY', 100); setConfig('CHARS', 2000);setConfig('SIZE',  '960x480'); location.reload()" />
+<input type="button" value="2015/5月"  onclick="setConfig('CACHE', 'auto');setConfig('BS',   32); setConfig('DELAY', 0);   setConfig('CHARS', 8000);setConfig('SIZE',  '1920x1080'); location.reload()" />
+<br />
+<input type="button" value="cache off"  onclick="setConfig('CACHE', 'off'); location.reload()" />
+<input type="button" value="cache on"   onclick="setConfig('CACHE', 'on');  location.reload()" />
+<input type="button" value="cache auto" onclick="setConfig('CACHE', 'auto');location.reload()" />
+<br />
+<input type="button" value="100"        onclick="setConfig('CHARS', 100);   location.reload()" />
+<input type="button" value="500"        onclick="setConfig('CHARS', 500);   location.reload()" />
+<input type="button" value="1000"       onclick="setConfig('CHARS', 1000);  location.reload()" />
+<input type="button" value="2000"       onclick="setConfig('CHARS', 2000);  location.reload()" />
+<input type="button" value="4000"       onclick="setConfig('CHARS', 4000);  location.reload()" />
+<input type="button" value="8000"       onclick="setConfig('CHARS', 8000);  location.reload()" />
+<br />
+<input type="button" value="480x320"    onclick="setConfig('SIZE',  '480x320'); location.reload()" />
+<input type="button" value="960x480"    onclick="setConfig('SIZE',  '960x480'); location.reload()" />
+<input type="button" value="1920x1080"  onclick="setConfig('SIZE',  '1920x1080'); location.reload()" />
+|
+<input type="button" value="320x480"    onclick="setConfig('SIZE',  '320x480'); location.reload()" />
+<input type="button" value="480x960"    onclick="setConfig('SIZE',  '480x960'); location.reload()" />
+<input type="button" value="1080x1920"  onclick="setConfig('SIZE',  '1080x1920'); location.reload()" />
+<br />
+<input type="button" value="bs 8"       onclick="setConfig('BS',    8);     location.reload()" />
+<input type="button" value="bs 16"      onclick="setConfig('BS',    16);    location.reload()" />
+<input type="button" value="bs 32"      onclick="setConfig('BS',    32);    location.reload()" />
+<input type="button" value="bs 64"      onclick="setConfig('BS',    64);    location.reload()" />
+ | 
+<input type="button" value="delay 100"  onclick="setConfig('DELAY', 100);   location.reload()" />
+<input type="button" value="delay 0"    onclick="setConfig('DELAY', 0);     location.reload()" />
+<br />
+
+<canvas id="screen" width="0" height="0" style="background:skyblue"></canvas>
+
+<script src="../node_modules/uupaa.perf.js/node_modules/uupaa.clock.js/lib/Clock.js"></script>
+<script src="../node_modules/uupaa.perf.js/lib/Perf.js"></script>
+<script src="../node_modules/uupaa.spec.js/lib/SpecCatalog.js"></script>
+<script src="../node_modules/uupaa.spec.js/lib/Spec.js"></script>
+<script src="../node_modules/uupaa.task.js/lib/Task.js"></script>
+<script src="../node_modules/uupaa.thread.js/lib/Thread.js"></script>
+<script src="../node_modules/uupaa.thread.js/lib/ThreadPool.js"></script>
+<script src="../node_modules/uupaa.textureatlas.js/lib/TextureAtlas.js"></script>
+<script src="wmtools.js"></script>
+<script src="../lib/Air.js"></script>
+<script src="../lib/Air.Node.js"></script>
+<script src="../lib/Air.NodeA.js"></script>
+<script src="../lib/Air.ImageFrame.js"></script>
+<script src="../lib/Air.Sprite.js"></script>
+<script src="../lib/Air.Cue.js"></script>
+
+<script>
+function getConfig(key, defaultValue) { return (key in localStorage) ? localStorage[key] : defaultValue; }
+function setConfig(key, value) { return localStorage[key] = value; }
+
+var spec = new Spec();
+
+var BENCHMARK  = true;
+var DELAY      = getConfig("DELAY", 100) >> 0;
+var CHARACTERS = getConfig("CHARS", 100) >> 0;
+var BLOCK_SIZE = getConfig("BS",    8)   >> 0;
+var SIZE       = getConfig("SIZE",  "480x960");
+
+var CACHE      = getConfig("CACHE", "off");
+var useCache   = { "off": false, "on": true, "auto": !/POWERVR/i.test(spec.GPU) }[CACHE];
+
+var SCREEN_WIDTH  = SIZE.split("x")[0] >> 0;
+var SCREEN_HEIGHT = SIZE.split("x")[1] >> 0;
+
+var canvas = document.querySelector("#screen");
+canvas.width  = SCREEN_WIDTH;
+canvas.height = SCREEN_HEIGHT;
+
+TextureAtlas["VERBOSE"] = false;
+TextureAtlas["VERBOSE_VERBOSE"] = false;
+TextureAtlas.MIN_BLOCK_SIZE = BLOCK_SIZE;
+TextureAtlas.MAX_BLOCK_SIZE = 64;
+
+var atlas = new TextureAtlas({ useCache: useCache });
+var perf  = BENCHMARK ? new Perf({ x: 360, y: 30 }) : {};
+var clock = new Clock([], { vsync: true, start: false });
+
+
+// --- information ---
+switch (DELAY) {
+case 100:   document.querySelector("input[type=button][value='delay 100']").classList.add("selected"); break;
+case 0:     document.querySelector("input[type=button][value='delay 0']").classList.add("selected"); break;
+}
+switch (CACHE) {
+case "off": document.querySelector("input[type=button][value='cache off']").classList.add("selected"); break;
+case "on":  document.querySelector("input[type=button][value='cache on']").classList.add("selected"); break;
+case "auto":document.querySelector("input[type=button][value='cache auto']").classList.add("selected"); break;
+}
+if (spec.MAX_TOUCH_POINTS) {
+    CHARACTERS = Math.min(CHARACTERS, 2000);
+}
+switch (CHARACTERS) {
+case 100:   document.querySelector("input[type=button][value='100']").classList.add("selected"); break;
+case 500:   document.querySelector("input[type=button][value='500']").classList.add("selected"); break;
+case 1000:  document.querySelector("input[type=button][value='1000']").classList.add("selected"); break;
+case 2000:  document.querySelector("input[type=button][value='2000']").classList.add("selected"); break;
+case 4000:  document.querySelector("input[type=button][value='4000']").classList.add("selected"); break;
+case 8000:  document.querySelector("input[type=button][value='8000']").classList.add("selected"); break;
+}
+switch (SIZE) {
+case "480x320":   document.querySelector("input[type=button][value='480x320']").classList.add("selected"); break;
+case "960x480":   document.querySelector("input[type=button][value='960x480']").classList.add("selected"); break;
+case "1920x1080": document.querySelector("input[type=button][value='1920x1080']").classList.add("selected"); break;
+case "320x480":   document.querySelector("input[type=button][value='320x480']").classList.add("selected"); break;
+case "480x960":   document.querySelector("input[type=button][value='480x960']").classList.add("selected"); break;
+case "1080x1920": document.querySelector("input[type=button][value='1080x1920']").classList.add("selected"); break;
+}
+switch (BLOCK_SIZE) {
+case 8:     document.querySelector("input[type=button][value='bs 8']").classList.add("selected"); break;
+case 16:    document.querySelector("input[type=button][value='bs 16']").classList.add("selected"); break;
+case 32:    document.querySelector("input[type=button][value='bs 32']").classList.add("selected"); break;
+case 64:    document.querySelector("input[type=button][value='bs 64']").classList.add("selected"); break;
+}
+
+
+
+</script>
+
+<script src="./js/Jump.js"></script>
+<script src="./js/Mario.js"></script>
+<script src="./js/Game.js"></script>
+<script>
+//var canvas = document.querySelector("#screen");
+var ctx = canvas.getContext("2d");
+
+if ("imageSmoothingEnabled" in ctx) {
+    ctx.imageSmoothingEnabled = false;
+} else {
+    ctx.webkitImageSmoothingEnabled = false;
+}
+
+var air   = new Air({ ctx: ctx, atlas: atlas, clock: clock });
+var asset = new Mario();
+var game  = new Game({ atlas: atlas, clock: clock, render: air, asset: asset });
+
+</script>
+
+</body></html>
+
+
